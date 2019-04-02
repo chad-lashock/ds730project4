@@ -11,17 +11,57 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Index {
-	public static void main(String args[]) {
-		File inputFolder = new File(args[0]);
-		File outputFolder = new File(args[1]);
-		int pageCharacters = Integer.parseInt(args[2]);
-		
+public class IndexRunner {
+	
+	private File inputDir;
+	private File outputDir;
+	private int charsPerPage;
+	
+	public static void main(String[] args) {
 		long startTime = System.currentTimeMillis();
-		
-		for (File f : inputFolder.listFiles()) {
+		IndexRunner runner = new IndexRunner(new File(args[0]), new File(args[1]), Integer.parseInt(args[2]));
+		runner.go();
+		System.out.println(System.currentTimeMillis()-startTime);
+	}
+	
+	public IndexRunner(File input, File output, int chars) {
+		this.inputDir = input;
+		this.outputDir = output;
+		this.charsPerPage = chars;
+	}
+	
+	public void go() {
+		ArrayList<IndexWorker> workerList = new ArrayList<IndexWorker>();
+		for (File x : this.inputDir.listFiles()) {
+			IndexWorker worker = new IndexWorker(x, this.outputDir, this.charsPerPage);
+			workerList.add(worker);
+			worker.start();
+		}
+		for (IndexWorker worker : workerList) {
 			try {
-				FileReader fr = new FileReader(f);
+				worker.join();
+			} catch (InterruptedException ie) {
+				System.err.println(ie.getMessage());
+			}
+		}
+	}
+	
+	
+	public static class IndexWorker extends Thread {
+		
+		private File file;
+		private File outputDir;
+		private int charsPerPage;
+		
+		public IndexWorker(File inputFile, File output, int chars) {
+			this.file = inputFile;
+			this.outputDir = output;
+			this.charsPerPage = chars;
+		}
+		
+		public void run() {
+			try {
+				FileReader fr = new FileReader(this.file);
 				BufferedReader br = new BufferedReader(fr);
 				String line = null;
 				int charCount = 0;
@@ -36,7 +76,7 @@ public class Index {
 								if (map.get(word) == null) {
 									map.put(word, new HashSet<Integer>());
 								}
-								if (charCount > pageCharacters) {
+								if (charCount > this.charsPerPage) {
 									charCount = word.length();
 									page++;
 								}
@@ -52,7 +92,7 @@ public class Index {
 				ArrayList<String> outList = new ArrayList<String>(map.keySet());
 				Collections.sort(outList);
 				
-				FileWriter fw = new FileWriter(new File(outputFolder, "a_" + f.getName()));
+				FileWriter fw = new FileWriter(new File(this.outputDir, "a_" + this.file.getName()));
 				BufferedWriter bw = new BufferedWriter(fw);
 				
 				for (String x : outList) {
@@ -73,7 +113,5 @@ public class Index {
 				e.printStackTrace();
 			}
 		}
-		
-		System.out.print(System.currentTimeMillis()-startTime);
 	}
 }
