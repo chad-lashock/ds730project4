@@ -92,7 +92,7 @@ public class IndexRunner {
 				ArrayList<String> outList = new ArrayList<String>(map.keySet());
 				Collections.sort(outList);
 				
-				FileWriter fw = new FileWriter(new File(this.outputDir, "a_" + this.file.getName()));
+				FileWriter fw = new FileWriter(new File(this.outputDir, this.file.getName().replace(".txt", "_output.txt")));
 				BufferedWriter bw = new BufferedWriter(fw);
 				
 				for (String x : outList) {

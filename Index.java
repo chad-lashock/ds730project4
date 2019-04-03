@@ -52,7 +52,7 @@ public class Index {
 				ArrayList<String> outList = new ArrayList<String>(map.keySet());
 				Collections.sort(outList);
 				
-				FileWriter fw = new FileWriter(new File(outputFolder, "a_" + f.getName()));
+				FileWriter fw = new FileWriter(new File(outputFolder, f.getName().replace(".txt", "_output.txt")));
 				BufferedWriter bw = new BufferedWriter(fw);
 				
 				for (String x : outList) {
@@ -74,6 +74,6 @@ public class Index {
 			}
 		}
 		
-		System.out.print(System.currentTimeMillis()-startTime);
+		System.out.println(System.currentTimeMillis()-startTime);
 	}
 }

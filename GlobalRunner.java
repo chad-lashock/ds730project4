@@ -72,10 +72,15 @@ public class GlobalRunner {
 				
 				
 				for (String fileName : fileNames) {
-					line.add(String.join(":", this.results.get(fileName).get(word)));
+					if (this.results.get(fileName).get(word) != null) {
+						line.add(String.join(":", this.results.get(fileName).get(word)));
+					} else {
+						line.add("");
+					}
 				}
 				
 				bw.write(String.join(", ", line));
+				bw.newLine();
 			}
 			
 			bw.close();
